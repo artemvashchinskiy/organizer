@@ -43,7 +43,18 @@ function CalendarCell({
             note=>note.completed
         ).length;
 
+    const today = new Date();
 
+    const todayString =
+
+        `${today.getFullYear()}-` +
+
+        `${String(today.getMonth()+1).padStart(2,"0")}-` +
+
+        `${String(today.getDate()).padStart(2,"0")}`;
+
+    const isToday =
+        date === todayString;
 
     return(
 
@@ -53,6 +64,7 @@ function CalendarCell({
                 `
                 calendar-cell
                 ${hasNotes ? "has-note":""}
+                ${isToday ? "today":""}
                 `
             }
 
@@ -75,19 +87,28 @@ function CalendarCell({
 
                 <div className="note-indicator">
 
-
                     <span>
                         ●
                     </span>
 
-
                     {
-                        completedCount > 0 &&
+                        completedCount > 0
+
+                        ?
+
                         <small>
                             {completedCount}/{dayNotes.length}
                         </small>
-                    }
 
+                        :
+
+                        dayNotes.length > 1 &&
+
+                        <small>
+                            {dayNotes.length}
+                        </small>
+
+                    }
 
                 </div>
 

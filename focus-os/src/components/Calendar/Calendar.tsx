@@ -115,7 +115,19 @@ function Calendar({
     }
 
 
+    function todayMonth(){
 
+        const now = new Date();
+
+        setMonth(
+            now.getMonth()
+        );
+
+        setYear(
+            now.getFullYear()
+        );
+
+    }
 
 
     function previousMonth(){
@@ -213,6 +225,17 @@ function Calendar({
                     {monthName}
 
                 </div>
+
+
+                <button
+
+                    className="back"
+
+                    onClick={todayMonth}
+
+                >
+                    Today
+                </button>
 
 
 

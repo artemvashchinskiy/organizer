@@ -53,7 +53,7 @@ function App(){
 
     const [showRegister,setShowRegister] = useState(false);
 
-
+    const [panelOpen, setPanelOpen] = useState(false);
 
 
 
@@ -255,6 +255,10 @@ function App(){
 
         setNotes([]);
 
+
+        setPanelOpen(false);
+
+        setEditingNote(null);
 
         setSelectedDate(null);
 
@@ -662,11 +666,19 @@ function completeNote(id:number){
     }
 
 
+    const visibleNotes =
 
+        selectedDate
 
+        ?
 
+        notes.filter(
+            note=>note.date===selectedDate
+        )
 
+        :
 
+        notes;
 
 
     return(
@@ -764,6 +776,10 @@ function completeNote(id:number){
 
                         setSelectedDate(date);
 
+                        setEditingNote(null);
+
+                        setPanelOpen(true);
+
                     }}
 
 
@@ -771,7 +787,26 @@ function completeNote(id:number){
                     />
 
 
+                    {
+                        selectedDate &&
 
+                        <button
+
+                            className="show-all-notes"
+
+                            onClick={()=>{
+
+                                setSelectedDate(null); 
+
+                            }}
+
+                        >
+
+                            Show all notes
+
+                        </button>
+
+                    }
 
 
 
@@ -779,14 +814,15 @@ function completeNote(id:number){
 
 
                     {
+                        panelOpen &&
 
-                        selectedDate &&
-
-
+                        
 
                         <NotePanel
 
-                            date={selectedDate}
+                            key={editingNote?.id ?? "new"}
+
+                            date={editingNote?.date ?? selectedDate!}
 
                             note={editingNote}
 
@@ -796,10 +832,9 @@ function completeNote(id:number){
 
                                 saveNote(note);
 
-
-                                setSelectedDate(null);
-
                                 setEditingNote(null);
+
+                                setPanelOpen(false);
 
 
                             }}
@@ -809,9 +844,8 @@ function completeNote(id:number){
                             onClose={()=>{
 
 
-                                setSelectedDate(null);
-
-                                  setEditingNote(null);
+                                setEditingNote(null);
+                                setPanelOpen(false);
 
 
                             }}
@@ -839,7 +873,7 @@ function completeNote(id:number){
 
             <NotesList
 
-                notes={notes}
+                notes={visibleNotes}
 
                 onDelete={deleteNote}
 
@@ -850,6 +884,8 @@ function completeNote(id:number){
                     setEditingNote(note);
 
                     setSelectedDate(note.date);
+
+                    setPanelOpen(true);
 
                 }}
 

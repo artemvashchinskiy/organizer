@@ -73,6 +73,36 @@ body {
     gap: 16px;
 }
 
+.show-all-notes{
+
+    width:100%;
+
+    padding:12px;
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
+
+    background:var(--panel);
+
+    color:var(--text-h);
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.show-all-notes:hover{
+
+    transform:translateY(-1px);
+
+    box-shadow:var(--shadow);
+
+}
+
 .notes-list {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -751,8 +781,23 @@ button:disabled {
 
 }
 
+// .calendar-cell.today{
 
+//     border:2px solid #2d8cff;
 
+//     background:#eef6ff;
+
+//     font-weight:600;
+
+// }
+
+.calendar-cell.today{
+
+    outline:2px solid #2d8cff;
+
+    outline-offset:-2px;
+
+}
 
 
 

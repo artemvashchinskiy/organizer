@@ -74,6 +74,6 @@ If I were building version 1.0:
 Improve calendar indicator
 ●
 5/2
-A Today button.
+A Today button. on click cell highlighted too
 run time when app is closed or inactive tab
 if finished - tab is togling red yellow so on

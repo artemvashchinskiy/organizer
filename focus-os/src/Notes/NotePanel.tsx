@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Note } from "../types/note";
 
 
@@ -20,6 +20,24 @@ function NotePanel({ date, note, onSave, onClose }: NotePanelProps) {
     const [minutes, setMinutes] = useState(
         note ? Math.floor(note.duration / 60) : 25
     );
+
+    useEffect(() => {
+
+        if (note) {
+
+            setText(note.text);
+
+            setMinutes(Math.floor(note.duration / 60));
+
+        } else {
+
+            setText("");
+
+            setMinutes(25);
+
+        }
+
+    }, [note]);
 
     function saveNote() {
         const timerSeconds = minutes * 60;
@@ -54,9 +72,9 @@ function NotePanel({ date, note, onSave, onClose }: NotePanelProps) {
             <div className="panel-header">
 
 
-                <b>
-                    New Note
-                </b>
+            <b>
+                {note ? "Edit Note" : "New Note"}
+            </b>
 
 
                 <button
