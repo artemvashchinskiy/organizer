@@ -10,7 +10,7 @@ import NotesList from "./components/Notes/NotesList";
 import LoginModal from "./components/Auth/LoginModal";
 import RegisterModal from "./components/Auth/RegisterModal";
 import LockScreen from "./components/Auth/LockScreen";
-
+import Sidebar from "./components/Sidebar/Sidebar";
 import type { Note } from "./types/note";
 
 import "./styles/app.scss";
@@ -19,7 +19,8 @@ import "./styles/app.scss";
 
 function App(){
 
-
+    const [sidebarOpen,setSidebarOpen]=
+        useState(false);
 
     const {
 
@@ -730,7 +731,17 @@ function completeNote(id:number){
 
 
 
-                <div className="spacer"/>
+                <button
+
+                    className="back"
+
+                    onClick={()=>setSidebarOpen(true)}
+
+                >
+
+                    ☰
+
+                </button>
 
 
 
@@ -766,8 +777,8 @@ function completeNote(id:number){
                     <Calendar
 
 
-                        notes={notes}
-
+                        notes={notes} 
+                        selectedDate={selectedDate}
 
 
                     onSelectDate={(date)=>{
@@ -910,7 +921,11 @@ function completeNote(id:number){
             </div>
 
 
-
+            <Sidebar
+                open={sidebarOpen}
+                onOpen={()=>setSidebarOpen(true)}
+                onClose={()=>setSidebarOpen(false)}
+            />
         </div>
 
 

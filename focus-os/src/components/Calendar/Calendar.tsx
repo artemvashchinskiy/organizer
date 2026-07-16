@@ -6,7 +6,7 @@ import type { Note } from "../../types/note";
 interface CalendarProps {
 
     notes: Note[];
-
+    selectedDate: string | null;
     onSelectDate: (date:string)=>void;
 
 }
@@ -16,6 +16,7 @@ interface CalendarProps {
 function Calendar({
 
     notes,
+    selectedDate,
     onSelectDate
 
 }:CalendarProps){
@@ -105,6 +106,7 @@ function Calendar({
                 day={day}
 
                 notes={notes}
+                selected={date === selectedDate}
 
                 onClick={onSelectDate}
 

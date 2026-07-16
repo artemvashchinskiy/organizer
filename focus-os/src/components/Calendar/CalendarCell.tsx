@@ -13,6 +13,15 @@ interface CalendarCellProps {
 
 }
 
+interface CalendarCellProps{
+
+    date:string;
+    day:number;
+    notes:Note[];
+    selected:boolean;
+    onClick:(date:string)=>void;
+
+}
 
 
 function CalendarCell({
@@ -20,6 +29,7 @@ function CalendarCell({
     date,
     day,
     notes,
+    selected,
     onClick
 
 }:CalendarCellProps){
@@ -64,6 +74,7 @@ function CalendarCell({
                 `
                 calendar-cell
                 ${hasNotes ? "has-note":""}
+                ${selected ? "selected" : ""}
                 ${isToday ? "today":""}
                 `
             }
