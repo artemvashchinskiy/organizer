@@ -22,8 +22,6 @@ interface NoteCardProps {
 
 }
 
-
-
 function NoteCard({
 
     note,
@@ -53,7 +51,8 @@ function NoteCard({
             className={
                 `
                 note-card
-                ${note.completed ? "done":""}
+                ${note.completed ? "done" : ""}
+                ${note.duplicate ? "duplicate" : ""}
                 `
             }
 
@@ -113,97 +112,122 @@ function NoteCard({
 
             </div>
 
+            {note.duplicate && (
 
+            <div
 
+            className="duplicate-warning"
+
+            style={{
+                background: note.duplicateColor ?? "#fff7cc"
+            }}
+
+            >
+                Imported {note.date}
+                <br/>
+
+                ⚠ Duplicate pair #{note.duplicateNumber}
+                <br />
+
+                {note.duplicateType==="imported"
+                    ?
+                    "Imported"
+                    :
+                    "Original"
+                }
+
+            </div>
+
+            )}
 
             <div className="timer-preview">
-            {
-                !note.completed &&
+                {
+                    !note.completed &&
 
 
-                <Timer
+                    <Timer
 
-                    remaining={note.remaining}
+                        remaining={note.remaining}
 
-                    running={note.running}
+                        running={note.running}
 
-                    endAt={note.endAt}
+                        endAt={note.endAt}
 
-                    onTick={(seconds)=>{
+                        onTick={(seconds)=>{
 
-                        onTick(
-
-                            note.id,
-
-                            seconds
-
-                        );
-
-                    }}
-
-
-
-                    onComplete={()=>{
-
-                        onComplete(
-
-                            note.id
-
-                        );                        
-
-                    }}
-                        onStart={()=>{
-
-
-                            onStart(
+                            onTick(
 
                                 note.id,
 
-                                note.remaining
+                                seconds
 
                             );
-
 
                         }}
 
 
 
+                        onComplete={()=>{
 
-
-
-                        onPause={()=>{
-
-
-                            onPause(
+                            onComplete(
 
                                 note.id
 
-                            );
-
+                            );                        
 
                         }}
-
-                />
-
-            }
+                            onStart={()=>{
 
 
+                                onStart(
+
+                                    note.id,
+
+                                    note.remaining
+
+                                );
+
+
+                            }}
 
 
 
-            {
-                note.completed &&
 
 
-                <div className="completed">
 
-                    Completed ✓
+                            onPause={()=>{
 
-                </div>
 
-            }
+                                onPause(
 
-</div>
+                                    note.id
+
+                                );
+
+
+                            }}
+
+                    />
+
+                }
+
+
+
+
+
+                {
+                    note.completed &&
+
+
+                    <div className="completed">
+
+                        Completed ✓
+
+                    </div>
+
+                }
+
+            </div>
 
         </div>
 

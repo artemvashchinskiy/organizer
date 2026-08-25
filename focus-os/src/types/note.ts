@@ -22,4 +22,16 @@ export interface Note{
 
     notified?:boolean;
 
+    duplicate?: boolean;
+
+    duplicateGroup?: string;
+
+    duplicateImportedAt?: number;
+
+    duplicateColor?: string;
+
+    duplicateNumber?: number;
+
+    duplicateType?: "original" | "imported";
+
 }

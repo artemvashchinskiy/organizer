@@ -12,6 +12,23 @@ import RegisterModal from "./components/Auth/RegisterModal";
 import LockScreen from "./components/Auth/LockScreen";
 import Sidebar from "./components/Sidebar/Sidebar";
 import type { Note } from "./types/note";
+import type { BackupEntry } from "./types/activityTypeLog";
+import { exportNotes, createExportFilename, mergeImportedNotes, restoreLocalBackup } from "./services/storageService";
+import {
+    getGoogleDriveConnection
+} from "./services/googleDriveService";
+
+import {
+    listGoogleDriveBackups,
+    uploadGoogleDriveBackup,
+    downloadGoogleDriveBackup,
+    deleteGoogleDriveBackup
+} from "./services/googleDriveApi";
+import {  listBackups, downloadBackup, finishDropboxLogin, getAccessToken, deleteDropboxBackup } from "./services/dropboxService";
+import {  uploadBackup} from "./services/dropboxService";
+import ActivityLog from "./components/ActivityLog/ActivityLog";
+import { addActivity, removeBackupActivity} from "./services/activityServiceLog"; 
+
 
 import "./styles/app.scss";
 
@@ -79,11 +96,56 @@ function App(){
     );
 
 
+    const [
+
+        dropboxConnected,
+
+        setDropboxConnected
+
+    ] = useState(false);
+
+    const [
+
+        activityOpen,
+
+        setActivityOpen
+
+    ] = useState(false);
+ 
+    const [
+        activityVersion,
+        setActivityVersion
+    ] = useState(0); 
+
+    const [
+        restoreMode,
+        setRestoreMode
+    ] = useState(false);
 
 
+    useEffect(() => {
 
+        async function checkDropboxConnection() {
 
+            try {
 
+                await getAccessToken();
+
+                setDropboxConnected(true);
+
+            }
+
+            catch {
+
+                setDropboxConnected(false);
+
+            }
+
+        }
+
+        checkDropboxConnection();
+
+    }, []);
 
     
 
@@ -246,6 +308,69 @@ function App(){
     }, [notes, setNotes]);
 
 
+useEffect(() => {
+
+        async function initializeDropbox() {
+
+            try {
+
+                // 1. Just returned from Dropbox?
+
+                const connected =
+                    await finishDropboxLogin();
+
+                if (connected) {
+
+                    setDropboxConnected(true);
+
+                    return;
+
+                }
+
+                // 2. Already connected?
+
+                try {
+
+                    await getAccessToken();
+
+                    setDropboxConnected(true);
+
+                }
+
+                catch {
+
+                    setDropboxConnected(false);
+
+                }
+
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                if (error instanceof Error) {
+
+                    alert(error.message);
+
+                }
+
+                else {
+
+                    alert(String(error));
+
+                }
+
+            }
+
+        }
+
+    initializeDropbox();
+
+}, []);
+
+ 
+ 
 
 
 
@@ -321,7 +446,53 @@ function App(){
 
 
 
+    // async function handleImport(){
 
+    //     try{
+
+    //         const imported =
+    //             await importNotes();
+
+    //         setNotes(prev =>
+    //             mergeImportedNotes(
+    //                 prev,
+    //                 imported.notes
+    //             )
+    //         );
+
+    //         addActivity(
+    //             "Local",
+    //             "restore",
+    //             imported.filename
+    //         );
+
+    //         setActivityVersion(
+    //             value => value + 1
+    //         );
+
+    //         // LOCAL restore mode
+    //         setRestoreMode(true);
+    //         setActivityOpen(true);
+
+    //         setTimeout(() => {
+
+    //             setActivityOpen(false);
+    //             setRestoreMode(false);
+
+    //         }, 5500);
+
+    //     }
+
+    //     catch(error){
+
+    //         console.error(
+    //             "Local import failed:",
+    //             error
+    //         );
+
+    //     }
+
+    // }
 
 
 
@@ -331,15 +502,544 @@ function App(){
 
         touch();
 
-        setNotes(prev=>
+        setNotes(prev=>{
 
-            prev.filter(
+            const deleting =
+                prev.find(n=>n.id===id);
 
-                note=>note.id!==id
+            if(!deleting)
+                return prev;
 
-            )
+            let next =
+                prev.filter(n=>n.id!==id);
 
-        );
+            if(deleting.duplicateGroup){
+
+                const sameGroup =
+                    next.filter(
+
+                        n=>
+                            n.duplicateGroup===
+                            deleting.duplicateGroup
+
+                    );
+
+                if (sameGroup.length === 1) {
+
+                    sameGroup[0].duplicate = false;
+
+                    sameGroup[0].duplicateGroup = undefined;
+
+                    sameGroup[0].duplicateNumber = undefined;
+
+                    sameGroup[0].duplicateColor = undefined;
+
+                    sameGroup[0].duplicateType = undefined;
+
+                    sameGroup[0].duplicateImportedAt = undefined;
+
+                }
+
+            }
+
+            return [...next];
+
+        });
+
+    }
+
+    async function onDropboxBackup() {
+
+        try {
+
+            const result =
+                await uploadBackup(notes);
+
+            addActivity(
+                "Dropbox",
+                "backup",
+                result.path_display
+            );
+
+            setActivityVersion(
+                value => value + 1
+            );
+
+            setActivityOpen(true);
+
+            setTimeout(() => {
+
+                setActivityOpen(false);
+                setRestoreMode(false);
+
+            }, 5500);
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+        }
+
+    }
+
+    async function onGoogleDriveBackup() {
+
+        try {
+
+            const connection =
+                getGoogleDriveConnection();
+
+            if (!connection) {
+
+                throw new Error(
+                    "Google Drive is not connected."
+                );
+
+            }
+
+
+            const filename =
+                createExportFilename();
+
+
+            const result =
+                await uploadGoogleDriveBackup(
+                    connection.accessToken,
+                    filename,
+                    notes
+                );
+
+
+            addActivity(
+                "Google",
+                "backup",
+                result.id
+            );
+
+
+            setActivityVersion(
+                value => value + 1
+            );
+
+
+            setRestoreMode(false);
+
+            setActivityOpen(true);
+
+
+            setTimeout(() => {
+
+                setActivityOpen(false);
+                setRestoreMode(false);
+
+            }, 5500);
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Google Drive backup failed:",
+                error
+            );
+
+        }
+
+    }
+
+    async function onGoogleDriveRestore() {
+
+        try {
+
+            const connection =
+                getGoogleDriveConnection();
+
+            if (!connection) {
+
+                throw new Error(
+                    "Google Drive is not connected."
+                );
+
+            }
+
+
+            const files =
+                await listGoogleDriveBackups(
+                    connection.accessToken
+                );
+
+
+            if (files.length === 0) {
+
+                throw new Error(
+                    "No Google Drive backups found."
+                );
+
+            }
+
+
+            setRestoreMode(true);
+
+            setActivityOpen(true);
+
+
+            setActivityVersion(
+                value => value + 1
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Google Drive restore failed:",
+                error
+            );
+
+        }
+
+    }
+ 
+    // async function onDropboxRestore(){
+
+    //     try{
+
+    //         const files =
+    //             await listBackups();
+
+    //         if(files.length === 0){
+
+    //             throw new Error(
+    //                 "No Dropbox backups found."
+    //             );
+
+    //         }
+
+    //         const latestBackup =
+    //             files[0];
+
+    //         const imported =
+    //             await downloadBackup(
+    //                 latestBackup.path_lower
+    //             );
+
+    //         if(!Array.isArray(imported)){
+
+    //             throw new Error(
+    //                 "Invalid Dropbox backup format."
+    //             );
+
+    //         }
+
+    //         setNotes(prev =>
+    //             mergeImportedNotes(
+    //                 prev,
+    //                 imported
+    //             )
+    //         );
+
+    //         addActivity(
+    //             "Dropbox",
+    //             "restore",
+    //             latestBackup.path_lower
+    //         );
+
+    //         setActivityVersion(
+    //             value => value + 1
+    //         );
+
+    //             setRestoreMode(true);
+    //             setActivityOpen(true);
+
+    //     }
+
+    //     catch(error){
+
+    //         console.error(
+    //             "Dropbox restore failed:",
+    //             error
+    //         );
+
+    //     }
+
+    // } 
+
+
+    async function onDropboxRestore(){
+
+        try{
+
+            const files =
+                await listBackups();
+
+            if(files.length === 0){
+
+                throw new Error(
+                    "No Dropbox backups found."
+                );
+
+            }
+
+            setRestoreMode(true);
+
+            setActivityOpen(true);
+
+            setActivityVersion(
+                value => value + 1
+            );
+
+        }
+
+        catch(error){
+
+            console.error(
+                "Dropbox restore failed:",
+                error
+            );
+
+        }
+
+    }
+
+
+    async function handleRestoreBackup(
+        entry: BackupEntry
+    ){
+
+        try{
+
+            const imported =
+                await downloadBackup(
+                    entry.path
+                );
+
+            if(!Array.isArray(imported)){
+
+                throw new Error(
+                    "Invalid Dropbox backup format."
+                );
+
+            }
+
+            setNotes(prev =>
+                mergeImportedNotes(
+                    prev,
+                    imported
+                )
+            );
+
+            addActivity(
+                "Dropbox",
+                "restore",
+                entry.path
+            );
+
+            setActivityVersion(
+                value => value + 1
+            );
+
+            setTimeout(() => {
+
+                setActivityOpen(false);
+                setRestoreMode(false);
+
+            }, 5500);
+
+        }
+
+        catch(error){
+
+            console.error(
+                "Dropbox restore failed:",
+                error
+            );
+
+        }
+
+    }
+
+    async function handleGoogleDriveRestoreBackup(
+    entry: BackupEntry
+    ) {
+
+        try {
+
+            const connection =
+                getGoogleDriveConnection();
+
+            if (!connection) {
+
+                throw new Error(
+                    "Google Drive is not connected."
+                );
+
+            }
+
+
+            const imported =
+                await downloadGoogleDriveBackup(
+                    connection.accessToken,
+                    entry.path
+                );
+
+
+            if (!Array.isArray(imported)) {
+
+                throw new Error(
+                    "Invalid Google Drive backup format."
+                );
+
+            }
+
+
+            setNotes(prev =>
+                mergeImportedNotes(
+                    prev,
+                    imported
+                )
+            );
+
+
+            addActivity(
+                "Google",
+                "restore",
+                entry.path
+            );
+
+
+            setActivityVersion(
+                value => value + 1
+            );
+
+
+            setTimeout(() => {
+
+                setActivityOpen(false);
+                setRestoreMode(false);
+
+            }, 5500);
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Google Drive restore failed:",
+                error
+            );
+
+        }
+
+    }
+
+    async function handleGoogleDriveDeleteBackup(
+        entry: BackupEntry
+    ) {
+
+        if (!entry.path) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const connection =
+                getGoogleDriveConnection();
+
+            if (!connection) {
+
+                throw new Error(
+                    "Google Drive is not connected."
+                );
+
+            }
+
+
+            await deleteGoogleDriveBackup(
+                connection.accessToken,
+                entry.path
+            );
+
+
+            removeBackupActivity(
+                entry.path
+            );
+
+
+            setActivityVersion(
+                value => value + 1
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Google Drive backup delete failed:",
+                error
+            );
+
+        }
+
+    }
+
+    async function handleLocalRestoreBackup(
+        entry: BackupEntry
+    ){
+
+        try{
+
+            const imported =
+                restoreLocalBackup(
+                    entry.path
+                );
+
+                console.log("LOCAL RESTORE REQUESTED:", entry.path);
+
+
+            setNotes(prev =>
+                mergeImportedNotes(
+                    prev,
+                    imported
+                )
+            );
+
+
+            addActivity(
+                "Local",
+                "restore",
+                entry.path
+            );
+
+
+            setActivityVersion(
+                value => value + 1
+            );
+
+
+            setTimeout(() => {
+
+                setActivityOpen(false);
+
+                setRestoreMode(false);
+
+            }, 5500);
+            
+
+        }
+
+        catch(error){
+
+            console.error(
+                "Local restore failed:",
+                error
+            );
+
+        }
 
     }
 
@@ -347,37 +1047,33 @@ function App(){
 
 
 
+    function updateTimer(
+        id:number,
+        seconds:number
+    ){
 
+        setNotes(prev=>
 
+            prev.map(note=>
 
+                note.id === id
 
-function updateTimer(
-    id:number,
-    seconds:number
-){
+                ?
 
-    setNotes(prev=>
+                {
+                    ...note,
+                    remaining:seconds
+                }
 
-        prev.map(note=>
+                :
 
-            note.id === id
+                note
 
-            ?
+            )
 
-            {
-                ...note,
-                remaining:seconds
-            }
+        );
 
-            :
-
-            note
-
-        )
-
-    );
-
-}
+    }
 
     function startTimer(
 
@@ -631,10 +1327,7 @@ function completeNote(id:number){
 
         }
 
-
-
-
-
+ 
 
 
 
@@ -680,6 +1373,39 @@ function completeNote(id:number){
         :
 
         notes;
+
+    async function handleDeleteBackup(
+        entry: BackupEntry
+    ){
+
+        if(!entry.path){
+
+            return;
+
+        }
+
+        try{
+
+            await deleteDropboxBackup(
+                entry.path
+            );
+
+            removeBackupActivity(
+                entry.path
+            );
+            setActivityVersion(
+                value => value + 1
+            );
+
+        }
+
+        catch(error){
+
+            console.error(error);
+
+        }
+
+    }
 
 
     return(
@@ -924,12 +1650,78 @@ function completeNote(id:number){
             <Sidebar
                 open={sidebarOpen}
                 onOpen={()=>setSidebarOpen(true)}
-                onClose={()=>setSidebarOpen(false)}
-            />
-        </div>
+                onClose={()=>{
+                    setSidebarOpen(false);
+                    setActivityOpen(false);
+                }}  
+                onExport={() => {
 
+                    const filename =
+                        exportNotes(notes);
+
+                    addActivity(
+                        "Local",
+                        "backup",
+                        filename
+                    );
+
+                    setActivityVersion(
+                        value => value + 1
+                    );
+
+                    // LOCAL backup log
+                    setRestoreMode(false);
+                    setActivityOpen(true);
+
+                    setTimeout(() => {
+
+                        setActivityOpen(false);
+                        setRestoreMode(false);
+
+                    }, 5500);
+
+                }}
+                onImport={() => {
+                    setRestoreMode(true);
+                    setActivityOpen(true);
+                }}
+                dropboxConnected={dropboxConnected}
+                onDropboxBackup={onDropboxBackup}
+                onDropboxRestore={onDropboxRestore}
+                onGoogleDriveBackup={onGoogleDriveBackup}
+                onGoogleDriveRestore={onGoogleDriveRestore}
+                onActivityOpen={()=>setActivityOpen(true)}  
+
+            /> 
+            <ActivityLog
+
+                open={activityOpen}
+
+                onClose={()=>setActivityOpen(false)}
+
+                onDeleteBackup={handleDeleteBackup}
+
+                onGoogleDriveDeleteBackup={
+                    handleGoogleDriveDeleteBackup
+                }
+
+                onRestoreBackup={handleRestoreBackup} 
+
+                onLocalRestoreBackup={handleLocalRestoreBackup}
+
+                onGoogleDriveRestoreBackup={handleGoogleDriveRestoreBackup}  
+
+                refreshKey={activityVersion}
+
+                restoreMode={restoreMode}
+
+            />
+  
+        </div>
+    
 
     )
+    
 
 }
 
