@@ -1,0 +1,247 @@
+.sidebar-overlay{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.35);
+
+    opacity:1;
+
+    z-index:998;
+
+}
+
+.sidebar{
+
+    position:fixed;
+
+    top:0;
+
+    right:-350px;
+
+    width:320px;
+
+    max-width:85vw;
+
+    height:100vh;
+
+    background:var(--panel);
+
+    border-left:1px solid var(--border);
+
+    box-shadow:-6px 0 20px rgba(0,0,0,.12);
+
+    transition:right .28s ease;
+
+    display:flex;
+
+    flex-direction:column;
+
+    padding:18px;
+
+    overflow:visible;
+
+    z-index:999;
+
+}
+
+.sidebar-content{
+    flex:1;
+    overflow-y:auto;
+}
+
+.sidebar-handle{
+
+    position:absolute;
+
+    left:-24px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    width:24px;
+
+    height:90px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border:1px solid var(--border);
+
+    border-right:none;
+
+    border-radius:14px 0 0 14px;
+
+    background:var(--panel);
+
+    cursor:pointer;
+
+    box-shadow:var(--shadow);
+
+    font-size:20px;
+
+    user-select:none;
+
+}
+
+.sidebar.open{
+
+    right:0;
+
+}
+
+.sidebar.open .sidebar-handle{
+
+    display:none;
+
+}
+
+.sidebar-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:18px;
+
+}
+
+.sidebar-section{
+
+    margin-bottom:24px;
+
+}
+
+.sidebar-section h4{
+
+    margin:18px 0 10px;
+
+    font-size:13px;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+
+    color:#888;
+
+}
+
+.sidebar button{
+
+    width:100%;
+
+    padding:10px 14px;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    background:var(--panel);
+
+    color:var(--text-h);
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    text-align:left;
+
+    font-size:15px;
+
+    margin-bottom:8px;
+
+}
+
+.sidebar button:hover{
+
+    transform:translateY(-1px);
+
+    box-shadow:var(--shadow);
+
+}
+
+.sidebar button:disabled{
+
+    opacity:.7;
+
+    cursor:wait;
+
+}
+
+.close-sidebar{
+
+    width:42px !important;
+
+    height:42px;
+
+    margin:0;
+
+    padding:0;
+
+}
+
+.sidebar-content{
+    flex:1;
+    overflow-y:auto;
+
+    scrollbar-width:none;      /* Firefox */
+    -ms-overflow-style:none;   /* old Edge/IE */
+}
+
+.sidebar-content::-webkit-scrollbar{
+    display:none;
+}
+
+
+
+
+// CLOUD ACTIONS
+
+.dropbox-bar{
+
+    display:flex;
+
+    width:100%;
+
+    margin-bottom:8px;  
+
+}
+
+.dropbox-bar button{
+
+    flex:1;
+
+    margin:0;
+
+    border-radius:0;
+
+}
+
+.dropbox-main{
+
+    flex:1.5 !important;
+
+    background:#F5F7FF !important;
+
+    cursor:default;
+
+}
+
+.dropbox-bar button:first-child{
+
+    border-radius:12px 0 0 12px;
+
+}
+
+.dropbox-bar button:last-child{
+
+    border-radius:0 12px 12px 0;
+
+}
