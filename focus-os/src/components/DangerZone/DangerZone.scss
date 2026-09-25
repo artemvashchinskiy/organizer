@@ -1,0 +1,137 @@
+.danger-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, .48);
+}
+
+.danger-panel {
+    width: min(520px, 100%);
+    max-height: min(720px, calc(100vh - 40px));
+    overflow-y: auto;
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--panel);
+    color: var(--text);
+    box-shadow: 0 18px 60px rgba(0, 0, 0, .24);
+}
+
+.danger-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.danger-header h2 {
+    margin: 4px 0;
+}
+
+.danger-header p {
+    margin: 0;
+    opacity: .65;
+}
+
+.danger-eyebrow {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    opacity: .55;
+}
+
+.danger-close {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+}
+
+.danger-actions,
+.danger-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.danger-actions button {
+    width: 100%;
+    min-height: 46px;
+    text-align: left;
+}
+
+.danger-delete {
+    border-color: #c94b4b;
+    color: #c94b4b;
+}
+
+.danger-form h3 {
+    margin: 0 0 4px;
+}
+
+.danger-form input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.warning {
+    margin: 0;
+    line-height: 1.55;
+    opacity: .78;
+}
+
+.danger-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.primary-danger {
+    border-color: #c94b4b;
+}
+
+.danger-message {
+    margin: 14px 0 0;
+    line-height: 1.45;
+}
+
+.danger-message.success {
+    color: #3a9b63;
+}
+
+@media (max-width: 520px) {
+    .danger-overlay {
+        padding: 10px;
+    }
+
+    .danger-panel {
+        max-height: calc(100vh - 20px);
+        padding: 18px;
+        border-radius: 12px;
+    }
+
+    .danger-row {
+        flex-direction: column-reverse;
+    }
+
+    .danger-row button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 320px) {
+    .danger-overlay {
+        padding: 6px;
+    }
+
+    .danger-panel {
+        padding: 14px;
+    }
+}
