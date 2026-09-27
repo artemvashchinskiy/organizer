@@ -1,0 +1,31 @@
+.matrix { display:flex; flex-direction:column; gap:14px; min-width:0; }
+.matrix-header h3 { margin:0; font-size:20px; }
+.matrix-header p { margin:4px 0 0; color:#888; font-size:13px; }
+.matrix-form { display:flex; flex-direction:column; gap:8px; min-width:0; }
+.matrix-form input,.matrix-form select,.matrix-form button { width:100%; box-sizing:border-box; min-width:0; min-height:38px; border:1px solid var(--border); border-radius:10px; background:var(--panel); color:var(--text-h); font:inherit; }
+.matrix-form input,.matrix-form select { padding:8px 10px; }
+.matrix-form button { padding:8px 14px; cursor:pointer; }
+.matrix-form button:hover { transform:translateY(-1px); box-shadow:var(--shadow); }
+.matrix-form button:disabled { opacity:.5; cursor:default; transform:none; box-shadow:none; }
+.matrix-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; min-width:0; }
+.matrix-quadrant { min-width:0; border:1px solid var(--border); border-radius:12px; padding:11px; background:var(--panel); }
+.matrix-quadrant-header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:9px; }
+.matrix-quadrant-header strong { display:block; font-size:14px; }
+.matrix-quadrant-header span { display:block; margin-top:2px; color:#888; font-size:11px; }
+.matrix-count { min-width:22px; padding:3px 6px; border-radius:999px; background:rgba(128,128,128,.12); text-align:center; color:#777!important; font-size:11px!important; }
+.matrix-tasks { display:flex; flex-direction:column; gap:6px; }
+.matrix-task { display:grid; grid-template-columns:minmax(0,1fr) 32px; align-items:start; gap:6px; min-height:34px; padding:5px; border-radius:8px; background:rgba(128,128,128,.07); min-width:0; }
+.matrix-task-text { min-width:0; overflow-wrap:anywhere; font-size:13px; line-height:1.4; padding-top:4px; }
+.matrix-task.completed .matrix-task-text { color:#999; text-decoration:line-through; }
+.matrix-check { width:32px !important; height:25px !important; padding:0 !important; border:1px solid var(--border) !important; border-radius:6px !important; background:var(--panel) !important; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.matrix-checkbox { width:17px; height:17px; border:1px solid #888; border-radius:4px; background:var(--panel); display:flex; align-items:center; justify-content:center; font-size:12px; line-height:1; }
+.matrix-task.completed .matrix-checkbox { background:rgba(80,160,100,.15); }
+.matrix-task-actions { display:flex; flex-direction:column; gap:3px; width:32px; }
+.matrix-task-actions button { width:32px; height:25px; padding:0; border:1px solid var(--border); border-radius:6px; background:var(--panel); color:var(--text-h); cursor:pointer; line-height:1; }
+.matrix-task-actions button:hover { transform:translateY(-1px); box-shadow:var(--shadow); }
+.matrix-task-actions button:disabled { opacity:.35; cursor:default; transform:none; box-shadow:none; }
+.matrix-edit-row { grid-column:1 / -1; display:flex; flex-direction:column; gap:6px; min-width:0; }
+.matrix-edit-row input { width:100%; box-sizing:border-box; min-width:0; min-height:36px; border:1px solid var(--border); border-radius:8px; padding:7px 9px; background:var(--panel); color:var(--text-h); font:inherit; }
+.matrix-edit-row button { width:100%; min-height:34px; border:1px solid var(--border); border-radius:8px; background:var(--panel); color:var(--text-h); cursor:pointer; }
+.matrix-empty { padding:8px 4px; color:#999; font-size:12px; }
+@media (max-width:520px) { .matrix-grid { grid-template-columns:1fr; } }
