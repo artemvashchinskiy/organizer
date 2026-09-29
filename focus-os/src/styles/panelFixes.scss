@@ -1,0 +1,43 @@
+/* Shared sliding panels: activity / about / license / danger */
+.activity-panel,
+.about-panel,
+.danger-panel,
+.license-panel {
+  left: 0;
+  right: auto !important;
+  width: min(520px, calc(100vw - 24px));
+  max-width: 520px;
+  transform: translateX(-110%);
+  transition: transform .28s ease;
+  box-sizing: border-box;
+}
+
+.activity-panel.open,
+.about-panel.open,
+.danger-panel.open,
+.license-panel.open {
+  transform: translateX(0);
+}
+
+.danger-actions {
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  width:100%;
+}
+
+.danger-actions button,
+.danger-row button {
+  max-width:100%;
+  width:100%;
+  box-sizing:border-box;
+}
+
+@media(max-width:520px){
+ .activity-panel,
+ .about-panel,
+ .danger-panel,
+ .license-panel {
+   width:calc(100vw - 12px);
+ }
+}
